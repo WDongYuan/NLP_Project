@@ -30,7 +30,7 @@ def search(file,query):
     # The ``Results`` object stores total results found, by default the top
     # ten most relevant results and any additional data like
     # facets/highlighting/spelling/etc.
-    # print("Saw {0} result(s).".format(len(results)))
+    print("Saw {0} result(s).".format(len(results)))
     # for result in results:
     #     print(result)
 
@@ -38,12 +38,12 @@ def search(file,query):
     # Just loop over it to access the results.
     for result in results:
         # print("The title is '{0}'.".format(result['id']))
-        # print(sentences[int(result['id'])])
+        print(sentences[int(result['id'])])
         searchresult.append(sentences[int(result['id'])])
     return searchresult
 
 if __name__=="__main__":
     # document=sys.argv[1]
-    document = "../data/set1/a2.txt"
-    question="Who is Landon Donovan?"
-    print(search(document,question))
+    document = "text.txt"
+    question="Who is an England soccer player?"
+    search(document,question)

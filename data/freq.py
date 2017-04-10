@@ -6,24 +6,28 @@ dic = {}
 punctuation = Set([",",".",":","\"","(",")","[","]",";","\'"])
 count = 0
 sentence = []
+alldata = open("alldata.txt","w+")
 for i in range(1,5):
 	for j in range(1,11):
 		file = open("./set"+str(i)+"/a"+str(j)+".txt")
 		# file = open("ptb.2-21.txt")
 		doc = ""
 		ss = file.readline()
+		alldata.write(ss+"\n")
 		while ss!="":
 			ss = ss.strip()
 			doc = doc+"."+ss
 			ss = file.readline()
+			alldata.write(ss+"\n")
 		sentence.append(doc)
 		file.close()
+alldata.close()
 
-# for i in range(1000):
-# 	path = "./nyt/file"+str(i)+".txt"
-# 	file = open(path)
-# 	sentence.append(file.readline().strip())
-# 	file.close()
+for i in range(1000):
+	path = "./nyt/file"+str(i)+".txt"
+	file = open(path)
+	sentence.append(file.readline().strip())
+	file.close()
 
 
 for ss in sentence:
