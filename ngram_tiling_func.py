@@ -5,6 +5,7 @@ from sets import Set
 from common_filter import CommonFilter
 from MyFilter import MyFilter
 from pycorenlp import StanfordCoreNLP
+import CommonFunction as cf
 # from Person_Filter import PersonFilter
 import common_filter
 import re
@@ -14,86 +15,86 @@ import math
 symbol = "_"
 N_GRAM = 3
 INFINITY = 1000000
-def MyCompare1(a,b):
-	if a[2][0]!=b[2][0]:
-		# print(str(a)+"----"+str(b))
-		return b[2][0]-a[2][0]
-	else:
-		return a[2][1]-b[2][1]
-def MyTokenize(sentence):
-	rawTokens = word_tokenize(sentence)
-	myTokens = [rawTokens[i].encode("ascii","ignore") for i in range(len(rawTokens))]
-	return myTokens
+# def MyCompare1(a,b):
+# 	if a[2][0]!=b[2][0]:
+# 		# print(str(a)+"----"+str(b))
+# 		return b[2][0]-a[2][0]
+# 	else:
+# 		return a[2][1]-b[2][1]
+# def MyTokenize(sentence):
+# 	rawTokens = word_tokenize(sentence)
+# 	myTokens = [rawTokens[i].encode("ascii","ignore") for i in range(len(rawTokens))]
+# 	return myTokens
 
-def SentencePOS(sentence):
-	raw_pos = pos_tag(word_tokenize(sentence))
-	pos = []
-	for tup in raw_pos:
-		pos.append([tup[0],tup[1]])
-	return pos
+# def SentencePOS(sentence):
+# 	raw_pos = pos_tag(word_tokenize(sentence))
+# 	pos = []
+# 	for tup in raw_pos:
+# 		pos.append([tup[0],tup[1]])
+# 	return pos
 
-def QueryKeyword(query):
-	stopWords = Set(stopwords.words('english'))
-	pos = SentencePOS(query)
-	pp = 0
-	while pp<len(pos):
-		if pos[pp][1][0]!="N" and pos[pp][1][0]!="V":
-			pos.pop(pp)
-		elif pos[pp][0] in stopWords:
-			pos.pop(pp)
-		else:
-			pp += 1
-	keyword = [pos[i][0] for i in range(len(pos))]
-	return Set(keyword)
+# def QueryKeyword(query):
+# 	stopWords = Set(stopwords.words('english'))
+# 	pos = SentencePOS(query)
+# 	pp = 0
+# 	while pp<len(pos):
+# 		if pos[pp][1][0]!="N" and pos[pp][1][0]!="V":
+# 			pos.pop(pp)
+# 		elif pos[pp][0] in stopWords:
+# 			pos.pop(pp)
+# 		else:
+# 			pp += 1
+# 	keyword = [pos[i][0] for i in range(len(pos))]
+# 	return Set(keyword)
 
-def GramQueryDst(gram,qWordList,senTokens):
-	gramWord = gram.split(symbol)
-	idxs = [i for i in range(len(senTokens)) if senTokens[i]==gramWord[0]]
-	if idxs == 0:
-		return [0,0]
-	position = []
-	for idx in idxs:
-		if idx+len(gramWord)-1>=len(senTokens):
-			continue
-		head = idx
-		end = -1
-		matchFlag = True
-		for i in range(len(gramWord)):
-			if matchFlag and gramWord[i] != senTokens[head+i]:
-				matchFlag = False
-		if matchFlag:
-			end = head+len(gramWord)-1
-			position.append([head,end])
-	# print(gram+":"+str(senTokens))
-	# print(position)
+# def GramQueryDst(gram,qWordList,senTokens):
+# 	gramWord = gram.split(symbol)
+# 	idxs = [i for i in range(len(senTokens)) if senTokens[i]==gramWord[0]]
+# 	if idxs == 0:
+# 		return [0,0]
+# 	position = []
+# 	for idx in idxs:
+# 		if idx+len(gramWord)-1>=len(senTokens):
+# 			continue
+# 		head = idx
+# 		end = -1
+# 		matchFlag = True
+# 		for i in range(len(gramWord)):
+# 			if matchFlag and gramWord[i] != senTokens[head+i]:
+# 				matchFlag = False
+# 		if matchFlag:
+# 			end = head+len(gramWord)-1
+# 			position.append([head,end])
+# 	# print(gram+":"+str(senTokens))
+# 	# print(position)
 
-	qWordIdx = {}
-	for word in qWordList:
-		for i in range(len(senTokens)):
-			if senTokens[i]==word:
-				if word not in qWordIdx:
-					qWordIdx[word] = []
-				qWordIdx[word].append(i)
-	# print(qWordIdx)
+# 	qWordIdx = {}
+# 	for word in qWordList:
+# 		for i in range(len(senTokens)):
+# 			if senTokens[i]==word:
+# 				if word not in qWordIdx:
+# 					qWordIdx[word] = []
+# 				qWordIdx[word].append(i)
+# 	# print(qWordIdx)
 
-	minDst = INFINITY
-	for onePos in position:
-		tmpWholeMin = 0
-		for qWord,idxs in qWordIdx.items():
-			tmpMinDst = INFINITY
-			for idx in idxs:
-				if idx<onePos[0] and tmpMinDst>(onePos[0]-idx):
-					tmpMinDst = onePos[0]-idx
-				elif idx>onePos[1] and tmpMinDst>(idx-onePos[1]):
-					tmpMinDst = idx-onePos[1]
-			tmpWholeMin += tmpMinDst
-		if minDst>tmpWholeMin:
-			minDst = tmpWholeMin
-	# print(minDst)
-	if minDst==0:
-		minDst = INFINITY	
+# 	minDst = INFINITY
+# 	for onePos in position:
+# 		tmpWholeMin = 0
+# 		for qWord,idxs in qWordIdx.items():
+# 			tmpMinDst = INFINITY
+# 			for idx in idxs:
+# 				if idx<onePos[0] and tmpMinDst>(onePos[0]-idx):
+# 					tmpMinDst = onePos[0]-idx
+# 				elif idx>onePos[1] and tmpMinDst>(idx-onePos[1]):
+# 					tmpMinDst = idx-onePos[1]
+# 			tmpWholeMin += tmpMinDst
+# 		if minDst>tmpWholeMin:
+# 			minDst = tmpWholeMin
+# 	# print(minDst)
+# 	if minDst==0:
+# 		minDst = INFINITY	
 
-	return [len(qWordIdx),minDst]
+# 	return [len(qWordIdx),minDst]
 
 
 
@@ -231,7 +232,7 @@ def NGramTiling(query,answerlist):
 
 	# General Filtering 
 	# print("Filter process.")
-	score = CommonFilter(QUERY,score)
+	# score = CommonFilter(QUERY,score)
 	myfilter = MyFilter()
 	score = myfilter.Filter(score,QUERY,grampos,gramner)
 	# print(score)
@@ -251,23 +252,29 @@ def NGramTiling(query,answerlist):
 
 
 	#Measure the distance of between the ngram and the keyword of the query
-	qKeyWord = QueryKeyword(query)
-	# print(len(qKeyWord))
-	for oneCom in combination:
-		gram = oneCom[0]
-		keyWordNum,keyWordDst = 0,0
-		for sen in answerlist:
-			senTokens = MyTokenize(sen)
-			nn,dd = GramQueryDst(gram,qKeyWord,senTokens)
-			if nn>keyWordNum and dd!=INFINITY:
-				keyWordNum = nn
-				keyWordDst = dd
-			elif nn==keyWordNum and keyWordDst>dd:
-				keyWordNum = nn
-				keyWordDst = dd
-		oneCom.append([keyWordNum,keyWordDst])
+	# qKeyWord = QueryKeyword(query)
+	# # print(len(qKeyWord))
+	# for oneCom in combination:
+	# 	gram = oneCom[0]
+	# 	keyWordNum,keyWordDst = 0,0
+	# 	for sen in answerlist:
+	# 		senTokens = MyTokenize(sen)
+	# 		nn,dd = GramQueryDst(gram,qKeyWord,senTokens)
+	# 		if nn>keyWordNum and dd!=INFINITY:
+	# 			keyWordNum = nn
+	# 			keyWordDst = dd
+	# 		elif nn==keyWordNum and keyWordDst>dd:
+	# 			keyWordNum = nn
+	# 			keyWordDst = dd
+	# 	oneCom.append([keyWordNum,keyWordDst])
+	# candidateList = combination
+	# candidateList = sorted(candidateList,cmp=MyCompare1)
 	candidateList = combination
-	candidateList = sorted(candidateList,cmp=MyCompare1)
+	queryType = cf.QueryClassification(QUERY)
+	if queryType == "PERSON":
+		None
+	elif queryType == "TIME":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query)
 	WriteFile(candidateList,"CandidateList.txt")
 
 
@@ -304,13 +311,20 @@ def NGramTiling(query,answerlist):
 
 if __name__ == "__main__":
 	# print(pos_tag(word_tokenize("Welcome to Carnegie Mellon University.")))
-	QUERY = "When was Dempsey born ?"
-	# QUERY = "Who is Dempsey ?"
-	# QUERY = "When did Dempsey join Seattle Sounders ?"
-	# print(QueryKeyword(QUERY))
-	MY_SEARCH_FILE = "./data/set1/a1.txt"
+	# QUERY = "When was Dempsey born ?"
+	QUERY = "Who is Dempsey ?"
+	QUERY = "When did Dempsey join Seattle Sounders ?"
+	QUERY = "When was Donovan born ?"
+	# # print(QueryKeyword(QUERY))
+	print(QUERY)
+	MY_SEARCH_FILE = "./data/set1/a2.txt"
 	answerlist = search(MY_SEARCH_FILE,QUERY)
-	print(NGramTiling(QUERY,answerlist))
+	answer = NGramTiling(QUERY,answerlist)
+	for word in answer:
+		print(word),
+
+	# print(StanfordNERPOS("Landon Timothy Donovan (born March 4, 1982) is an "+\
+	# 	"American retired professional soccer player, who played as a forward."))
 
 
 
