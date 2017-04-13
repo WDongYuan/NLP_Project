@@ -9,6 +9,7 @@ class MyFilter:
 		elif queryarr[0].lower()=="when":
 			return "TIME"
 		return None
+		
 	def Filter(self,candidate,query,grampos,gramner):
 		queryclass = self.QueryClassification(query)
 		result = []

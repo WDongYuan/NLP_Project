@@ -11,12 +11,12 @@ import math
 
 
 symbol = "_"
-QUERY = "When was Dempsey born?"
+QUERY = "When was Dempsey born ?"
 MY_SEARCH_FILE = "./data/set1/a1.txt"
-N_GRAM = 3
+N_GRAM = 4
 
 def StanfordNERPOS(sentence):
-	nlp = StanfordCoreNLP('http://localhost:9000')
+	nlp = StanfordCoreNLP('http://localhost:53511')
 	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner','outputFormat':'json'})
 	ner = []
 	pos = []
@@ -140,10 +140,10 @@ def main():
 
 	# General Filtering 
 	print("Filter process.")
-	# score = CommonFilter(QUERY,score)
+	score = CommonFilter(QUERY,score)
 	myfilter = MyFilter()
 	score = myfilter.Filter(score,QUERY,grampos,gramner)
-	print(score)
+	# print(score)
 
 	#Combination
 	print("Combination.")
