@@ -17,13 +17,35 @@ class MyFilter:
 			for gram in candidate:
 				if self.IsName(gram[0],grampos,gramner) or self.IsPerson(gram[0],grampos,gramner):
 						result.append(gram)
+		elif queryclass=="PERSON_ENTITY":
+			candidate = CommonFilter(query,candidate)
+			for gram in candidate:
+				if self.IsPerson(gram[0],grampos,gramner):
+						result.append(gram)
 		elif queryclass=="TIME":
 			candidate = CommonFilter(query,candidate)
+			# print(candidate)
 			for gram in candidate:
 				if self.IsTime(gram[0],grampos,gramner):
 					result.append(gram)
+		elif queryclass=="LOCATION":
+			candidate = CommonFilter(query,candidate)
+			for gram in candidate:
+				if self.IsLocationOrganization(gram[0],grampos,gramner):
+					result.append(gram)
+		# elif queryclass=="LOCATION":
+		# 	candidate = CommonFilter(query,candidate)
+		# 	for 
 		return result
 
+	def IsLocationOrganization(self,gram,grampos,gramner):
+		arr = gram.split(symbol)
+		pos = grampos[gram].split(symbol)
+		ner = gramner[gram].split(symbol)
+		if ner[-1]=="LOCATION" or ner[-1]=="ORGANIZATION":
+			return True
+		else:
+			return False
 		
 
 
@@ -140,14 +162,20 @@ class MyFilter:
 
 		return [len(qWordIdx),minDst]
 
-	def KeyWordDistance(self,candidateList,answerList, query):
+	def KeyWordDistance(self,candidateList,answerList, query,wordstem):
 		qKeyWord = self.QueryKeyword(query)
+		#Get the stem of qKeyWord
+		qKeyWord = [wordstem[tmpw] for tmpw in qKeyWord]
+
 		# print(len(qKeyWord))
 		for oneCom in candidateList:
 			gram = oneCom[0]
 			keyWordNum,keyWordDst = 0,0
 			for sen in answerList:
 				senTokens = cf.MyTokenize(sen)
+				#Get the stem for a candidate sentence
+				senTokens = [wordstem[senTokens[i]] for i in range(len(senTokens)) if senTokens[i] in wordstem]
+
 				nn,dd = self.GramQueryDst(gram,qKeyWord,senTokens)
 				if nn>keyWordNum and dd!=INFINITY:
 					keyWordNum = nn

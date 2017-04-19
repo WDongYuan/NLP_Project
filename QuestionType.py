@@ -2,7 +2,10 @@ from nltk import word_tokenize, pos_tag, ne_chunk
 from pycorenlp import StanfordCoreNLP
 def StanfordNERPOS(sentence):
 	nlp = StanfordCoreNLP('http://localhost:9000')
-	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner','outputFormat':'json'})
+	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner,depparse','outputFormat':'json'})
+	dep = output['sentences'][0]["basicDependencies"]
+	for tmpdep in dep:
+		print(tmpdep)
 
 	ner = []
 	pos = []
@@ -31,7 +34,12 @@ sentence = "Clinton Drew \"Clint\" Dempsey (born March 9, 1983) is an American "
 sentence = "He won the highest individual honor in football in America when he was named"+\
 			" Honda Player of the Year for 2006, beating Fulham teammates Kasey Keller and"+\
 			" Brian McBride in a poll of sportswriters."
-# sentence = "He is a professor."
+sentence = "What did he play in England on Sunday?"
+# sentence = "What is Linear Regression?"
+sentence = "What course do you like to take?"
+sentence = "What is the weather like in Beijing?"
+sentence = "What do you want to buy?"
+sentence = "What did you do in England"
 result = StanfordNERPOS(sentence)
 for row in result:
 	for word in row:

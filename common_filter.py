@@ -1,5 +1,6 @@
 from nltk.corpus import stopwords
 from sets import Set
+import CommonFunction as cf
 symbol = "_"
 punctuation = [",",":",".",""]
 def CommonFilter(query,score):
@@ -16,7 +17,7 @@ def RemoveStopWord(query,score):
 	while i<len(score):
 		arr = score[i][0].split(symbol)
 		for j in range(len(arr)):
-			if arr[j] in stopWords:
+			if arr[j] in stopWords and not arr[j].isdigit():
 				score.pop(i)
 				i -= 1
 				break
@@ -24,7 +25,7 @@ def RemoveStopWord(query,score):
 	return score
 
 def RemoveQueryWord(query,score):
-	queryWord = Set(query.split(" "))
+	queryWord = Set(cf.MyTokenize(query))
 	i=0
 	while i<len(score):
 		arr = score[i][0].split(symbol)
@@ -40,7 +41,7 @@ def RemoveNotWord(score):
 	while i<len(score):
 		arr = score[i][0].split(symbol)
 		for j in range(len(arr)):
-			if not arr[j].isalpha():
+			if not arr[j].isalpha() and not arr[j].isdigit():
 				score.pop(i)
 				i -= 1
 				break

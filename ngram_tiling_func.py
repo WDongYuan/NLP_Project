@@ -13,7 +13,7 @@ import math
 
 
 symbol = "_"
-N_GRAM = 3
+N_GRAM = 4
 INFINITY = 1000000
 # def MyCompare1(a,b):
 # 	if a[2][0]!=b[2][0]:
@@ -103,17 +103,17 @@ INFINITY = 1000000
 
 
 
-def StanfordNERPOS(sentence):
-	# print("Connect to the port: 53510")
-	nlp = StanfordCoreNLP('http://localhost:9000')
-	# print("Port connected: 53510")
-	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner','outputFormat':'json'})
-	ner = []
-	pos = []
-	for token in output['sentences'][0]['tokens']:
-		ner.append([token['word'].encode('ascii', 'ignore'),token['ner'].encode('ascii', 'ignore')])
-		pos.append([token['word'].encode('ascii', 'ignore'),token['pos'].encode('ascii', 'ignore')])
-	return ner,pos
+# def StanfordNERPOS(sentence):
+# 	# print("Connect to the port: 53510")
+# 	nlp = StanfordCoreNLP('http://localhost:9000')
+# 	# print("Port connected: 53510")
+# 	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner','outputFormat':'json'})
+# 	ner = []
+# 	pos = []
+# 	for token in output['sentences'][0]['tokens']:
+# 		ner.append([token['word'].encode('ascii', 'ignore'),token['ner'].encode('ascii', 'ignore')])
+# 		pos.append([token['word'].encode('ascii', 'ignore'),token['pos'].encode('ascii', 'ignore')])
+# 	return ner,pos
 
 def WriteFile(data,path):
 	file = open(path,"w+")
@@ -125,10 +125,13 @@ def GenerateNGram(n,doc,grampos,gramner):
 	gram = {}
 	pos = grampos
 	gram_count = 0
+	stemlist = []
 	for line in doc:
 		# print(line)
 		# linepos = pos_tag(word_tokenize(line))
-		linener,linepos = StanfordNERPOS(line)
+		linener,linepos = cf.StanfordNERPOS(line)
+		linestem = cf.StanfordStemmer(line)
+		stemlist += linestem
 		# print(linener)
 		# print("-----------"+str(linepos))
 		line = [linepos[i][0] for i in range(len(linepos))]
@@ -156,7 +159,7 @@ def GenerateNGram(n,doc,grampos,gramner):
 				gramner[tup] = nergram
 			gram[tup] += 1
 			gram_count += 1
-	return [gram,gram_count]
+	return [gram,gram_count,stemlist]
 
 def ProcessData(irresult):
 	result = []
@@ -208,16 +211,25 @@ def NGramTiling(query,answerlist):
 	gram = []
 	grampos = {}
 	gramner = {}
+	wordstem = {}
 	for ss in pro_data:
 		doc .append(ss)
 		# ss = file.readline().strip()
 		# ss = file.readline().strip().lower()
 	for i in range(n):
-		tmpgram,tmpcount = GenerateNGram(i+1,doc,grampos,gramner)
+		tmpgram,tmpcount,tmpstem = GenerateNGram(i+1,doc,grampos,gramner)
+		# print(tmpstem)
 		gram.append(tmpgram)
+		for tup in tmpstem:
+			wordstem[tup[0]] = tup[1]
 	# print(grampos)
 	# print(gram)
 
+	#Get the stem for query
+	qstem = cf.StanfordStemmer(query)
+	for onestem in qstem:
+		wordstem[onestem[0]] = onestem[1]
+	# print(wordstem)
 
 	# Voting: Calculate the score for every snippet
 	# print("Voting.")
@@ -226,7 +238,7 @@ def NGramTiling(query,answerlist):
 		for k,v in gram[i].items():
 			score.append([k,v])
 	score = sorted(score,key=lambda onescore:onescore[1], reverse = True)
-	# WriteFile(score,"voteresult.txt")
+	WriteFile(score,"voteresult.txt")
 	# print(score)
 
 
@@ -272,9 +284,13 @@ def NGramTiling(query,answerlist):
 	candidateList = combination
 	queryType = cf.QueryClassification(QUERY)
 	if queryType == "PERSON":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+		# None
+	elif queryType == "PERSON_ENTITY":
+		# candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query)
 		None
 	elif queryType == "TIME":
-		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query)
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
 	WriteFile(candidateList,"CandidateList.txt")
 
 
@@ -311,20 +327,39 @@ def NGramTiling(query,answerlist):
 
 if __name__ == "__main__":
 	# print(pos_tag(word_tokenize("Welcome to Carnegie Mellon University.")))
-	# QUERY = "When was Dempsey born ?"
-	QUERY = "Who is Dempsey ?"
-	QUERY = "When did Dempsey join Seattle Sounders ?"
-	QUERY = "When was Donovan born ?"
+	# Q = "When was Dempsey born ?"
+	# Q = "Who is John Terry ?"
+	# Q = "Who is the Chelsea Captain ?"
+	# Q = "When did Dempsey join Seattle Sounders ?"
+	# Q = "When was Donovan born ?"
+	# Q = "When Terry became the captain ?"
+	# Q = "Who is Chelsea Captain ?"
+	# Q = "Where does Terry play football?"
 	# # print(QueryKeyword(QUERY))
-	print(QUERY)
-	MY_SEARCH_FILE = "./data/set1/a2.txt"
-	answerlist = search(MY_SEARCH_FILE,QUERY)
-	answer = NGramTiling(QUERY,answerlist)
+	# Q = "Where was Solo born ?"
+	# Q = "Who did Alessandro Volta marry?"
+	Q = "Who made Volta a count?"
+	# Q = "When did Volta retire?"
+	# Q = "Where was Volta born?"
+	Q = "Who showed that Avogadro's theory held in dilute solutions?"
+	Q = "Who wrote about ants in A Tramp Abroad?"
+	Q = "Where are bullet ants located?"
+	Q = "Where is the city of Antwerp?"
+	Q = "When was the first photgraph of lincoln taken?"
+	Q = "When did he publish another memoria?"
+	Q = "When did he become a professor?"
+	print(Q)
+	# MY_SEARCH_FILE = "./data/set4/a8.txt"
+	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S08/data/set4/a8.txt"
+	answerlist = search(MY_SEARCH_FILE,Q)
+	answer = NGramTiling(Q,answerlist)
 	for word in answer:
 		print(word),
 
-	# print(StanfordNERPOS("Landon Timothy Donovan (born March 4, 1982) is an "+\
-	# 	"American retired professional soccer player, who played as a forward."))
+	# print(cf.StanfordNERPOS("In 2007, he became the first captain to lift the FA Cup "+\
+	# 	"at the new Wembley Stadium in Chelsea\'s 10 win over Manchester United, and "+\
+	# 	"also the first player to score an international goal there, scoring a header "+\
+	# 	"in England\'s 11 draw with Brazil."))
 
 
 
