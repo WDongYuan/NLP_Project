@@ -238,6 +238,7 @@ def NGramTiling(query,answerlist):
 		for k,v in gram[i].items():
 			score.append([k,v])
 	score = sorted(score,key=lambda onescore:onescore[1], reverse = True)
+	# print(len(score))
 	WriteFile(score,"voteresult.txt")
 	# print(score)
 
@@ -246,7 +247,7 @@ def NGramTiling(query,answerlist):
 	# print("Filter process.")
 	# score = CommonFilter(QUERY,score)
 	myfilter = MyFilter()
-	score = myfilter.Filter(score,QUERY,grampos,gramner)
+	score = myfilter.Filter(score,QUERY,grampos,gramner,pro_data,wordstem)
 	# print(score)
 
 	#Combination
@@ -259,6 +260,7 @@ def NGramTiling(query,answerlist):
 		for i in range(len(arr)):
 			tmpscore += gram[0][arr[i]]
 		combination.append([word,tmpscore])
+		# print(word)
 	combination = sorted(combination, key=lambda tup:tup[1],reverse = True)
 	WriteFile(combination,"Combination.txt")
 
@@ -283,6 +285,10 @@ def NGramTiling(query,answerlist):
 	# candidateList = sorted(candidateList,cmp=MyCompare1)
 	candidateList = combination
 	queryType = cf.QueryClassification(QUERY)
+	print(queryType)
+	what = Set(["DO_VP","DO_NP","IS_NP"])
+	how = Set(["HOW_JJ","HOW_ADV","HOW_DEGREE"])
+	why = Set(["REASON"])
 	if queryType == "PERSON":
 		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
 		# None
@@ -291,6 +297,23 @@ def NGramTiling(query,answerlist):
 		None
 	elif queryType == "TIME":
 		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "DO_NP":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "SUBJ_DO":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "DET_DO_NP":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "DET_SUBJ_DO":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "IS_NP":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "HOW_DEGREE":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType in what or queryType in how or queryType in why:
+		# print(answerlist[0])
+		return [answerlist[0]]
+	else:
+		return [answerlist[0]]
 	WriteFile(candidateList,"CandidateList.txt")
 
 
@@ -320,12 +343,37 @@ def NGramTiling(query,answerlist):
 	# 		tmpsum += math.log(float(docmunet_count)/df)
 	# 	tup[1] = tup[1]*1.0/len(arr)*tmpsum
 	# combination = sorted(combination, key=lambda tup:tup[1],reverse = True)
+	if len(candidateList)==0 or candidateList[0][2][0]==0:
+		return [answerlist[0]]
 	answer_phrase = candidateList[0][0].split(symbol)
 	# print(combination[0:11])
 	return answer_phrase
 	# WriteFile(combination,"finalresult.txt")
 
+
+def TestCode():
+	qfile = open("/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S09/querydata.txt")
+	QQ = []
+	ss = qfile.readline().strip()
+	while ss!="":
+		QQ.append(ss)
+		ss = qfile.readline().strip()
+	for qq in QQ:
+		filepath = qq.split("\t")[1]
+		Q = qq.split("\t")[0]
+		print(Q)
+		MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S09/"+filepath+".txt"
+		answerlist = search(MY_SEARCH_FILE,Q)
+		if len(answerlist)>20:
+			answerlist = answerlist[0:21]
+		answer = NGramTiling(Q,answerlist)
+		for word in answer:
+			print(word),
+		print("")
+
+
 if __name__ == "__main__":
+	# TestCode()
 	# print(pos_tag(word_tokenize("Welcome to Carnegie Mellon University.")))
 	# Q = "When was Dempsey born ?"
 	# Q = "Who is John Terry ?"
@@ -348,19 +396,60 @@ if __name__ == "__main__":
 	Q = "When was the first photgraph of lincoln taken?"
 	Q = "When did he publish another memoria?"
 	Q = "When did he become a professor?"
+	Q = "What is the battery made by Alessandro Volta credited as?"
+	Q = "What are the three segments of an ant?"
+	Q = "What is the only variety of modern Arabic that has acquired official language status?"
+	Q = "How long was Lincoln's formal education?"
+	Q = "When did the Gettysburg address argue that America was born?"
+	Q = "What is the smallest suborder of turtles?"
+	Q = "What does the word Ghana mean?"
+	# Q = "What do river otters eat?"
+	Q = "What does a polar bear's fur provide?"
+	Q = "What caused Calvin Jr.'s death?"
+	Q = "What does violincello mean?"
+	# *Q = "What kind of ducks feed on land?"
+	Q = "What do most recognizable international company and largest employer have in common?"
+	Q = "What district was Ford elected from?"
+	Q = "What shares land borders with Papua New Guinea, East Timor and Malaysia?"
+	Q = "What type of creatures breathe air and don't lay eggs underwater?"
+	Q = "What did Uruguay win in 1828?"
+	Q = "What is the largest ethnic minority in Romania?"
+	Q = "What is actually black in color?"
+	Q = "What is the last word on the page?"
+	Q = "What is the largest living species of penguin?"
+	Q = "What is an otter's den called?."
+	Q = "What is a collective noun for kangaroos?"
+	Q = "What is now part of Adams National Historical Park?"
+	# Q = "Which spice originally attracted Europeans to Indonesia?"
+	Q = "Which Russian army general conquered Finland in 1809?"
+	Q = "Which future Heisman Trophy winner did Ford tackle?"
+	Q = "Which temperature scale did Celsius propose?"
+	Q = "Which part of the strings does the left hand touch?"
+	Q = "How long do most foxes live?"
+	Q = "How many people did the 1970 Bhola cyclone kill?"
+	Q = "How much area does Dhaka cover?"
+	Q = "How many groups are turtles broken down into?"
+	Q = "How did civil wars affect England during the Middle Ages?"
+	Q = "How old was Celsius when he died?"
+	Q = "How does a trumpet produce sound?"
+	Q = "What did Pascal argue was as perfect as possible?"
+	Q = "When did Charles-Augustin de Coulomb retire to a small estate he possessed at Blois?"
+
 	print(Q)
 	# MY_SEARCH_FILE = "./data/set4/a8.txt"
-	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S08/data/set4/a8.txt"
+	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S09/data/set4/a6.txt"
 	answerlist = search(MY_SEARCH_FILE,Q)
+	if len(answerlist)>20:
+		answerlist = answerlist[0:21]
 	answer = NGramTiling(Q,answerlist)
 	for word in answer:
 		print(word),
+	# print(answer[0])
 
 	# print(cf.StanfordNERPOS("In 2007, he became the first captain to lift the FA Cup "+\
 	# 	"at the new Wembley Stadium in Chelsea\'s 10 win over Manchester United, and "+\
 	# 	"also the first player to score an international goal there, scoring a header "+\
 	# 	"in England\'s 11 draw with Brazil."))
-
 
 
 

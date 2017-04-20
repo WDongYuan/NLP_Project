@@ -18,7 +18,7 @@ import nltk
 #  "to independence and then became its first President."
 # sent = "What is the location of Police Station?"
 # sent = "Where is your children's high school?"
-sent =  "When did you born in Paris?"
+sent =  "When did you begin to study in Paris?"
 # print(nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sent)),binary=True))
 pos = nltk.pos_tag(nltk.word_tokenize(sent))
 # print(pos)

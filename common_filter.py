@@ -24,13 +24,13 @@ def RemoveStopWord(query,score):
 		i += 1
 	return score
 
-def RemoveQueryWord(query,score):
+def RemoveQueryWord(query,score,notremoved=[]):
 	queryWord = Set(cf.MyTokenize(query))
 	i=0
 	while i<len(score):
 		arr = score[i][0].split(symbol)
 		for j in range(len(arr)):
-			if arr[j] in queryWord:
+			if arr[j] in queryWord and arr[j] not in notremoved:
 				score.pop(i)
 				i -= 1
 				break
@@ -42,6 +42,18 @@ def RemoveNotWord(score):
 		arr = score[i][0].split(symbol)
 		for j in range(len(arr)):
 			if not arr[j].isalpha() and not arr[j].isdigit():
+				score.pop(i)
+				i -= 1
+				break
+		i += 1
+	return score
+def RemoveNotWordWithNumber(score,grampos):
+	i = 0
+	while i<len(score):
+		arr = score[i][0].split(symbol)
+		arrpos = grampos[score[i][0]].split(symbol)
+		for j in range(len(arr)):
+			if not arr[j].isalpha() and not (arr[j].isdigit() or arrpos[j]=="CD"):
 				score.pop(i)
 				i -= 1
 				break
