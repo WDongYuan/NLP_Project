@@ -5,6 +5,7 @@ from sets import Set
 from common_filter import CommonFilter
 from MyFilter import MyFilter
 from pycorenlp import StanfordCoreNLP
+# from CommonFunction import corenlp_port
 import CommonFunction as cf
 # from Person_Filter import PersonFilter
 import common_filter
@@ -15,6 +16,8 @@ import math
 symbol = "_"
 N_GRAM = 4
 INFINITY = 1000000
+corenlp_port = "9000"
+# corenlp_port = "9000"
 # def MyCompare1(a,b):
 # 	if a[2][0]!=b[2][0]:
 # 		# print(str(a)+"----"+str(b))
@@ -184,7 +187,9 @@ def ProcessData(irresult):
 		# result.append(newss)
 	return result
 
-def NGramTiling(query,answerlist):
+def NGramTiling(query,answerlist,core_nlp_port):
+	cf.corenlp_port = core_nlp_port
+	# corenlp_port = "9000"
 	#IR Process
 	# print("IR processing")
 	# irresult = search(MY_SEARCH_FILE,QUERY)
@@ -464,7 +469,7 @@ if __name__ == "__main__":
 	answerlist = search(MY_SEARCH_FILE,Q)
 	if len(answerlist)>20:
 		answerlist = answerlist[0:21]
-	answer = NGramTiling(Q,answerlist)
+	answer = NGramTiling(Q,answerlist,"9000")
 	for word in answer:
 		print(word),
 	# print(answer[0])

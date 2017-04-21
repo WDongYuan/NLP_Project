@@ -8,6 +8,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.parse.stanford import StanfordParser
 from nltk.parse.stanford import StanfordDependencyParser
 import re
+from ngram_tiling_func import symbol
 
 Q = "What can you do for solving this problem?"
 # Q = "What did you do in this summer?"
@@ -92,6 +93,7 @@ print(cf.QueryClassification(Q))
 print('Celsius'.isalpha())
 ner,pos = cf.StanfordNERPOS(sentence)
 print(pos)
+print(symbol)
 # print("")
 # sentence = "What did he finish?"
 # dep = cf.StanfordDependency(sentence)

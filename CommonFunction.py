@@ -3,6 +3,7 @@ from nltk.corpus import stopwords
 from sets import Set
 from pycorenlp import StanfordCoreNLP
 from nltk.corpus import stopwords
+corenlp_port = ""
 punctuation = [",",":",".",""]
 def MyCompare1(a,b):
 	if a[2][0]!=b[2][0]:
@@ -34,7 +35,7 @@ def SentencePOS(sentence):
 		pos.append([tup[0],tup[1]])
 	return pos
 def StanfordTokenize(sentence):
-	nlp = StanfordCoreNLP('http://localhost:9000')
+	nlp = StanfordCoreNLP('http://localhost:'+corenlp_port)
 	# print("Port connected: 53510")
 	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner','outputFormat':'json'})
 	tokens = []
@@ -44,7 +45,7 @@ def StanfordTokenize(sentence):
 
 def StanfordNERPOS(sentence):
 	# print("Connect to the port: 53510")
-	nlp = StanfordCoreNLP('http://localhost:9000')
+	nlp = StanfordCoreNLP('http://localhost:'+corenlp_port)
 	# print("Port connected: 53510")
 	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,ner','outputFormat':'json'})
 	# print(output)
@@ -156,7 +157,7 @@ def QueryClassification(query):
 
 		return None
 def StanfordDependency(sentence):
-	nlp = StanfordCoreNLP('http://localhost:9000')
+	nlp = StanfordCoreNLP('http://localhost:'+corenlp_port)
 	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,depparse','outputFormat':'json'})
 	dep = output['sentences'][0]["basicDependencies"]
 	# for tmpdep in dep:
@@ -164,7 +165,7 @@ def StanfordDependency(sentence):
 	return dep
 
 def StanfordStemmer(sentence):
-	nlp = StanfordCoreNLP('http://localhost:9000')
+	nlp = StanfordCoreNLP('http://localhost:'+corenlp_port)
 	output = nlp.annotate((sentence),properties={'annotators':'tokenize,pos,lemma','outputFormat':'json'})
 	stem = []
 	for token in output['sentences'][0]['tokens']:
