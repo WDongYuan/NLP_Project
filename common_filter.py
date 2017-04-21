@@ -3,9 +3,9 @@ from sets import Set
 import CommonFunction as cf
 symbol = "_"
 punctuation = [",",":",".",""]
-def CommonFilter(query,score):
+def CommonFilter(query,score,wordstem):
 	score = RemoveStopWord(query,score)
-	score = RemoveQueryWord(query,score)
+	score = RemoveQueryWord(query,score,wordstem)
 	score = RemoveNotWord(score)
 	return score
 
@@ -24,16 +24,21 @@ def RemoveStopWord(query,score):
 		i += 1
 	return score
 
-def RemoveQueryWord(query,score,notremoved=[]):
+def RemoveQueryWord(query,score,wordstem,notremoved=[]):
 	queryWord = Set(cf.MyTokenize(query))
+	queryWord = Set([wordstem[tmpw] for tmpw in queryWord])
 	i=0
 	while i<len(score):
 		arr = score[i][0].split(symbol)
-		for j in range(len(arr)):
-			if arr[j] in queryWord and arr[j] not in notremoved:
-				score.pop(i)
-				i -= 1
-				break
+		if len(arr)==1 and wordstem[arr[0]] in queryWord:
+			score.pop(i)
+			i -= 1
+		else:
+			for j in range(len(arr)):
+				if wordstem[arr[j]] in queryWord and wordstem[arr[j]] not in notremoved:
+					score.pop(i)
+					i -= 1
+					break
 		i += 1
 	return score
 def RemoveNotWord(score):

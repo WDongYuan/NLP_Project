@@ -114,6 +114,8 @@ def QueryClassification(query):
 						return "DET_DO_NP"
 					elif onedep["dep"]=="nsubj" and onedep["dependentGloss"].lower()==theobj:
 						return "DET_SUBJ_DO"
+					elif onedep["dep"]=="nsubjpass" and onedep["dependentGloss"].lower()==theobj:
+						return "DET_PASS_DO"
 		elif queryarr[0].lower()=="why":
 			return "REASON"
 		elif queryarr[0].lower()=="how":

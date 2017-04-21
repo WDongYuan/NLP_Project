@@ -58,13 +58,33 @@ Q = "How long do most foxes live?"
 Q = "How do you go to school?"
 Q = "How would you go to school?"
 Q = "How long does he live?"
+Q = "What butterfly is migratory?"
+Q = "What part of the cymbal is the bell?"
 
 sentence = "The place where we live is Earth."
 sentence = "The collective noun for kangaroos is a mob, troop, or court."
 sentence = "Celsius founded the Uppsala Astronomical Observatory in 1741, and "+\
 "in 1742 he proposed the Celsius temperature scale in a paper to the Royal Swedish Academy of Sciences."
 sentence = "The 1970 Bhola cyclone devastated much of the region, killing an estimated 500,000 people."
-
+# *Q = "What was given by Aristotle for the hardened shield like forewings?"
+Q = "What have been inhabited for millennia by aboriginal peoples?"
+Q = "What is the world population of Asian elephants?"
+sentence = "The world population of Asian elephants  also called Indian Elephants or Elephas "+\
+"maximus  is estimated to be around 60,000, about a tenth of the number of African elephants."
+Q = "What is the life expectancy for men in Finland?"
+Q = "What kinds of coats do wolves have?"
+Q = "What kinds of drink do you have?"
+Q = "What country did you work in?"
+Q = "I deal with the problem two days a go."
+Q = "I come from China."
+Q = "What kind of animal is protected?"
+Q = "Panda is protected."
+Q = "What book is read by John?"
+Q = "Christmas is the most extensively celebrated holiday: usually at least 23rd to 26th of December are holidays."
+# Q = "What centerd in Sierra?"
+# Q = "I lied on the table."
+# Q = "I worked in China."
+# Q = "What country are the biggest country in the world?"
 dep = cf.StanfordDependency(Q)
 for sample in dep:
 	print(sample)

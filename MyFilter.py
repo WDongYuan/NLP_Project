@@ -9,34 +9,34 @@ INFINITY = 1000000
 class MyFilter:
 
 	
-		
 	def Filter(self,candidate,query,grampos,gramner,irresult,wordstem):
+		self.wordstem = wordstem
 		queryclass = cf.QueryClassification(query)
 		result = []
 		if queryclass=="PERSON":
-			candidate = CommonFilter(query,candidate)
+			candidate = CommonFilter(query,candidate,wordstem)
 			for gram in candidate:
 				if self.IsName(gram[0],grampos,gramner) or self.IsPerson(gram[0],grampos,gramner):
 						result.append(gram)
 		elif queryclass=="PERSON_ENTITY":
-			candidate = CommonFilter(query,candidate)
+			candidate = CommonFilter(query,candidate,wordstem)
 			for gram in candidate:
 				if self.IsPerson(gram[0],grampos,gramner):
 						result.append(gram)
 		elif queryclass=="TIME":
-			candidate = CommonFilter(query,candidate)
+			candidate = CommonFilter(query,candidate,wordstem)
 			# print(candidate)
 			for gram in candidate:
 				if self.IsTime(gram[0],grampos,gramner):
 					result.append(gram)
 		elif queryclass=="LOCATION":
-			candidate = CommonFilter(query,candidate)
+			candidate = CommonFilter(query,candidate,wordstem)
 			for gram in candidate:
 				if self.IsLocationOrganization(gram[0],grampos,gramner):
 					result.append(gram)
 		elif queryclass == "DO_NP":
 			candidate = common_filter.RemoveNotWord(candidate)
-			candidate = common_filter.RemoveQueryWord(query,candidate)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem)
 			dep = cf.StanfordDependency(query)
 			keyword = ""
 			for onedep in dep:
@@ -55,7 +55,7 @@ class MyFilter:
 			return result
 		elif queryclass == "SUBJ_DO":
 			candidate = common_filter.RemoveNotWord(candidate)
-			candidate = common_filter.RemoveQueryWord(query,candidate)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem)
 			dep = cf.StanfordDependency(query)
 			keyword = ""
 			for onedep in dep:
@@ -85,14 +85,15 @@ class MyFilter:
 
 			notremoved = Set([theobj])
 			for onedep in dep:
-				if onedep["dep"]=="compound":
+				if onedep["dep"]=="compound" or onedep["dep"]=="nmod":
 					if onedep["dependentGloss"]==theobj:
-						notremoved.add(onedep["governorGloss"])
+						notremoved.add(wordstem[onedep["governorGloss"]])
 					elif onedep["governorGloss"]==theobj:
-						notremoved.add(onedep["dependentGloss"])
+						notremoved.add(wordstem[onedep["dependentGloss"]])
 			candidate = common_filter.RemoveNotWord(candidate)
 			# print(candidate)
-			candidate = common_filter.RemoveQueryWord(query,candidate,notremoved)
+			# print(notremoved)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem,notremoved)
 			# print(candidate)
 			# print(theobj)
 			for onedep in dep:
@@ -110,6 +111,7 @@ class MyFilter:
 				# print(gram)
 				if self.HasKeyword(gram[0],keywordlist,wordstem):
 					result.append(gram)
+			# print(keyword)
 			return result
 		elif queryclass == "DET_SUBJ_DO":
 			# candidate = common_filter.RemoveNotWord(candidate)
@@ -126,13 +128,13 @@ class MyFilter:
 
 			notremoved = Set([theobj])
 			for onedep in dep:
-				if onedep["dep"]=="compound":
+				if onedep["dep"]=="compound"or onedep["dep"]=="nmod":
 					if onedep["dependentGloss"]==theobj:
-						notremoved.add(onedep["governorGloss"])
+						notremoved.add(wordstem[onedep["governorGloss"]])
 					elif onedep["governorGloss"]==theobj:
-						notremoved.add(onedep["dependentGloss"])
+						notremoved.add(wordstem[onedep["dependentGloss"]])
 			candidate = common_filter.RemoveNotWord(candidate)
-			candidate = common_filter.RemoveQueryWord(query,candidate,notremoved)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem,notremoved)
 
 			for onedep in dep:
 				if onedep["dep"]=="nsubj" and onedep["dependentGloss"].lower()==theobj:
@@ -150,8 +152,12 @@ class MyFilter:
 			for gram in candidate:
 				if self.HasKeyword(gram[0],keywordlist,wordstem):
 					result.append(gram)
+			print(keyword)
 			return result
 		elif queryclass == "IS_NP":
+			# candidate = common_filter.RemoveNotWord(candidate)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem)
+			candidate = common_filter.RemoveStopWord(query,candidate)
 			keyword = ""
 			dep = cf.StanfordDependency(query)
 			for onedep in dep:
@@ -165,18 +171,63 @@ class MyFilter:
 						keywordlist.append(wordstem[onedep["dependentGloss"]])
 					elif onedep["dep"]=="nsubj" and wordstem[onedep["dependentGloss"]]==wordstem[keyword]:
 						keywordlist.append(wordstem[onedep["governorGloss"]])
+			print(keywordlist)
 			for gram in candidate:
 				if self.HasKeyword(gram[0],keywordlist,wordstem):
 					result.append(gram)
+			# print(keyword)
 			return result
 		elif queryclass == "HOW_DO":
 			return []
 		elif queryclass == "HOW_DEGREE":
-			candidate = common_filter.RemoveQueryWord(query,candidate)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem)
+			candidate = common_filter.RemoveStopWord(query,candidate)
 			candidate = common_filter.RemoveNotWordWithNumber(candidate,grampos)
 			for gram in candidate:
 				if self.HasNumber(gram[0],grampos)==True:
 					result.append(gram)
+			return result
+		elif queryclass == "DET_PASS_DO":
+			# candidate = common_filter.RemoveNotWord(candidate)
+			# candidate = common_filter.RemoveQueryWord(query,candidate,notremoved)
+			dep = cf.StanfordDependency(query)
+			# queryarr = cf.MyTokenize(query)
+			keyword = ""
+			theobj = ""
+			for onedep in dep:
+				if onedep["dep"]=="det" and onedep["dependentGloss"].lower()=="what"\
+				or onedep["dependentGloss"].lower()=="which":
+					theobj = onedep["governorGloss"]
+					break
+
+			notremoved = Set([theobj])
+			for onedep in dep:
+				if onedep["dep"]=="compound" or onedep["dep"]=="nmod":
+					if onedep["dependentGloss"]==theobj:
+						notremoved.add(wordstem[onedep["governorGloss"]])
+					elif onedep["governorGloss"]==theobj:
+						notremoved.add(wordstem[onedep["dependentGloss"]])
+
+			candidate = common_filter.RemoveNotWord(candidate)
+			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem,notremoved)
+
+			for onedep in dep:
+				if onedep["dep"]=="nsubjpass" and onedep["dependentGloss"].lower()==theobj:
+					keyword = onedep["governorGloss"]
+					break
+			keywordlist = []
+			for tmpsen in irresult:
+				tmpdep = cf.StanfordDependency(tmpsen)
+				for onedep in tmpdep:
+					# try:
+					if onedep["dep"]=="nsubjpass" and wordstem[onedep["governorGloss"]]==wordstem[keyword]:
+						keywordlist.append(wordstem[onedep["dependentGloss"]])
+					# except:
+					# 	print(onedep)
+			for gram in candidate:
+				if self.HasKeyword(gram[0],keywordlist,wordstem):
+					result.append(gram)
+			# print(keyword)
 			return result
 		# elif queryclass=="LOCATION":
 		# 	candidate = CommonFilter(query,candidate)
@@ -257,9 +308,9 @@ class MyFilter:
 		# print(pos)
 		pp = 0
 		while pp<len(pos):
-			if pos[pp][1][0]!="N" and pos[pp][1][0]!="V":
-				pos.pop(pp)
-			elif pos[pp][0] in stopWords:
+			# if pos[pp][1][0]!="N" and pos[pp][1][0]!="V":
+			# 	pos.pop(pp)
+			if pos[pp][0] in stopWords:
 				pos.pop(pp)
 			else:
 				pp += 1

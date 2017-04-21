@@ -1,4 +1,4 @@
-from search import search
+# from search import search
 from nltk import word_tokenize, pos_tag, ne_chunk
 from sets import Set
 from common_filter import CommonFilter
@@ -189,11 +189,11 @@ def NGramTiling(query,answerlist):
 	return answer_phrase
 	# WriteFile(combination,"finalresult.txt")
 
-if __name__ == "__main__":
-	QUERY = "Who is Dempsey ?"
-	MY_SEARCH_FILE = "../data/set1/a1.txt"
-	answerlist = search(MY_SEARCH_FILE,QUERY)
-	print(NGramTiling(QUERY,answerlist))
+# if __name__ == "__main__":
+# 	QUERY = "Who is Dempsey ?"
+# 	MY_SEARCH_FILE = "../data/set1/a1.txt"
+# 	answerlist = search(MY_SEARCH_FILE,QUERY)
+# 	print(NGramTiling(QUERY,answerlist))
 
 
 

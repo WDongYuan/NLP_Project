@@ -309,6 +309,8 @@ def NGramTiling(query,answerlist):
 		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
 	elif queryType == "HOW_DEGREE":
 		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
+	elif queryType == "DET_DO_PASS":
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
 	elif queryType in what or queryType in how or queryType in why:
 		# print(answerlist[0])
 		return [answerlist[0]]
@@ -434,10 +436,31 @@ if __name__ == "__main__":
 	Q = "How does a trumpet produce sound?"
 	Q = "What did Pascal argue was as perfect as possible?"
 	Q = "When did Charles-Augustin de Coulomb retire to a small estate he possessed at Blois?"
+	Q = "How many people speak the Arabic language?"
+	Q = "How long are cougar adult males (from nose to tail)?"
+	Q = "How long is an adult cougar's paw print?"
+	Q = "How many verb paradigms are there in Korean?"
+	Q = "What butterfly is migratory?"
+	Q = "What is the standardized form of spoken chinese?"
+	Q = "What part of the cymbal is the bell?"
+	Q = "What have been inhabited for millennia by aboriginal peoples?"
+	Q = "What land animal has the largest brain?"
+	Q = "What is the world population of Asian elephants?"
+	Q = "What is the life expectancy for men in Finland?"
+	Q = "What is the weather like in summer?"
+	Q = "What positions Ford played in the school football team?"
+	Q = "What kinds of coats do wolves have?"
+	Q = "What centred in Sierra?"
+	Q = "What is one significant non-official language?"
+	Q = "What is Canada's national unemployment rate?"
+	Q = "What did Canada adopt in 1965?"
+	Q = "What kind of ducks feed on land?"
+	Q = "What is the most extensively celebrated holiday?"
+	Q = "What does the word Ghana mean?"
 
 	print(Q)
 	# MY_SEARCH_FILE = "./data/set4/a8.txt"
-	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S09/data/set4/a6.txt"
+	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S08/data/set2/a5.txt"
 	answerlist = search(MY_SEARCH_FILE,Q)
 	if len(answerlist)>20:
 		answerlist = answerlist[0:21]
