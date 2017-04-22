@@ -25,7 +25,8 @@ def RemoveStopWord(query,score):
 	return score
 
 def RemoveQueryWord(query,score,wordstem,notremoved=[]):
-	queryWord = Set(cf.MyTokenize(query))
+	# queryWord = Set(cf.MyTokenize(query))
+	queryWord = Set(cf.StanfordTokenize(query))
 	queryWord = Set([wordstem[tmpw] for tmpw in queryWord])
 	i=0
 	while i<len(score):

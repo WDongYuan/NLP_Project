@@ -294,12 +294,13 @@ def NGramTiling(query,answerlist,core_nlp_port):
 	what = Set(["DO_VP","DO_NP","IS_NP"])
 	how = Set(["HOW_JJ","HOW_ADV","HOW_DEGREE"])
 	why = Set(["REASON"])
-	if queryType == "PERSON":
+	if queryType == "PERSON" or "LOCATION":
+		# print(candidateList)
 		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
 		# None
 	elif queryType == "PERSON_ENTITY":
-		# candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query)
-		None
+		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query)
+		# None
 	elif queryType == "TIME":
 		candidateList = myfilter.KeyWordDistance(candidateList,answerlist,query,wordstem)
 	elif queryType == "DO_NP":
@@ -370,17 +371,21 @@ def TestCode():
 		Q = qq.split("\t")[0]
 		print(Q)
 		MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S09/"+filepath+".txt"
-		answerlist = search(MY_SEARCH_FILE,Q)
+		try:
+			answerlist = search(MY_SEARCH_FILE,Q)
+		except Exception as e:
+			print(e)
+			continue
 		if len(answerlist)>20:
 			answerlist = answerlist[0:21]
-		answer = NGramTiling(Q,answerlist)
+		answer = NGramTiling(Q,answerlist,"9000")
 		for word in answer:
 			print(word),
 		print("")
 
 
 if __name__ == "__main__":
-	# TestCode()
+	TestCode()
 	# print(pos_tag(word_tokenize("Welcome to Carnegie Mellon University.")))
 	# Q = "When was Dempsey born ?"
 	# Q = "Who is John Terry ?"
@@ -462,10 +467,11 @@ if __name__ == "__main__":
 	Q = "What kind of ducks feed on land?"
 	Q = "What is the most extensively celebrated holiday?"
 	Q = "What does the word Ghana mean?"
+	Q = "Where did Volta enter retirement?"
 
 	print(Q)
 	# MY_SEARCH_FILE = "./data/set4/a8.txt"
-	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S08/data/set2/a5.txt"
+	MY_SEARCH_FILE = "/Users/weidong/Downloads/Question_Answer_Dataset_v1.2/S08/data/set4/a10.txt"
 	answerlist = search(MY_SEARCH_FILE,Q)
 	if len(answerlist)>20:
 		answerlist = answerlist[0:21]

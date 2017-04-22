@@ -57,7 +57,8 @@ def StanfordNERPOS(sentence):
 	return ner,pos
 
 def QueryClassification(query):
-		queryarr = MyTokenize(query)
+		# queryarr = MyTokenize(query)
+		queryarr = StanfordTokenize(query)
 		ner,pos = StanfordNERPOS(query)
 		if queryarr[0].lower()=="who":
 			beV = Set(["is","are","was","were"])

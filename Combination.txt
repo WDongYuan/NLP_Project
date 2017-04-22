@@ -1,2 +1,0 @@
-['Warrior_King', 3]
-['King', 2]

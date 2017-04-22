@@ -31,9 +31,12 @@ class MyFilter:
 					result.append(gram)
 		elif queryclass=="LOCATION":
 			candidate = CommonFilter(query,candidate,wordstem)
+			# print(candidate)
+			# print("~~~~~~~~~~~~")
 			for gram in candidate:
 				if self.IsLocationOrganization(gram[0],grampos,gramner):
 					result.append(gram)
+
 		elif queryclass == "DO_NP":
 			candidate = common_filter.RemoveNotWord(candidate)
 			candidate = common_filter.RemoveQueryWord(query,candidate,wordstem)
@@ -152,7 +155,7 @@ class MyFilter:
 			for gram in candidate:
 				if self.HasKeyword(gram[0],keywordlist,wordstem):
 					result.append(gram)
-			print(keyword)
+			# print(keyword)
 			return result
 		elif queryclass == "IS_NP":
 			# candidate = common_filter.RemoveNotWord(candidate)
@@ -171,7 +174,7 @@ class MyFilter:
 						keywordlist.append(wordstem[onedep["dependentGloss"]])
 					elif onedep["dep"]=="nsubj" and wordstem[onedep["dependentGloss"]]==wordstem[keyword]:
 						keywordlist.append(wordstem[onedep["governorGloss"]])
-			print(keywordlist)
+			# print(keywordlist)
 			for gram in candidate:
 				if self.HasKeyword(gram[0],keywordlist,wordstem):
 					result.append(gram)
@@ -238,7 +241,9 @@ class MyFilter:
 		arr = gram.split(symbol)
 		pos = grampos[gram].split(symbol)
 		ner = gramner[gram].split(symbol)
-		if ner[-1]=="LOCATION" or ner[-1]=="ORGANIZATION":
+		if ner[-1]=="LOCATION" or ner[-1]=="ORGANIZATION" or  ner[-1]=="COUNTRY":
+			# if arr[-1]=="Spain":
+			# 	print(ner[-1])
 			return True
 		else:
 			return False
@@ -390,6 +395,8 @@ class MyFilter:
 			keyWordNum,keyWordDst = 0,0
 			for sen in answerList:
 				senTokens = cf.MyTokenize(sen)
+				# print(sen)
+				# senTokens = cf.StanfordTokenize(sen)
 				# print(senTokens)
 				#Get the stem for a candidate sentence
 				senTokens = [wordstem[senTokens[i]] for i in range(len(senTokens)) if senTokens[i] in wordstem]
